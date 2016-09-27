@@ -458,6 +458,7 @@ cb.save.model <- function(save_period = 0, save_name = "xgboost.model") {
 #' \code{basket},
 #' \code{data},
 #' \code{end_iteration},
+#' \code{params},
 #' \code{num_parallel_tree},
 #' \code{num_class}.
 #' 
@@ -482,12 +483,18 @@ cb.cv.predict <- function(save_models = FALSE) {
       stop("'cb.cv.predict' callback requires 'basket' and 'bst_folds' lists in its calling frame")
     
     N <- nrow(env$data)
-    pred <- ifelse(env$num_class > 1, 
-                   matrix(NA_real_, N, env$num_class), 
-                   rep(NA_real_, N))
+    pred <- 
+      if (env$num_class > 1) {
+        matrix(NA_real_, N, env$num_class)
+      } else {
+        rep(NA_real_, N)
+      }
 
     ntreelimit <- NVL(env$basket$best_ntreelimit, 
                       env$end_iteration * env$num_parallel_tree)
+    if (NVL(env$params[['booster']], '') == 'gblinear') {
+      ntreelimit <- 0 # must be 0 for gblinear
+    }
     for (fd in env$bst_folds) {
       pr <- predict(fd$bst, fd$watchlist[[2]], ntreelimit = ntreelimit, reshape = TRUE)
       if (is.matrix(pred)) {

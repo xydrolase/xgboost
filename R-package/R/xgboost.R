@@ -84,19 +84,27 @@ NULL
 #' @importFrom Matrix sparse.model.matrix
 #' @importFrom Matrix sparseVector
 #' @importFrom data.table data.table
+#' @importFrom data.table is.data.table
 #' @importFrom data.table as.data.table
 #' @importFrom data.table :=
 #' @importFrom data.table rbindlist
+#' @importFrom data.table setkey
+#' @importFrom data.table setkeyv
 #' @importFrom data.table setnames
 #' @importFrom magrittr %>%
-#' @importFrom stringr str_detect
-#' @importFrom stringr str_extract
-#' @importFrom stringr str_match
-#' @importFrom stringr str_replace
-#' @importFrom stringr str_replace_all
-#' @importFrom stringr str_split
+#' @importFrom stringi stri_detect_regex
+#' @importFrom stringi stri_match_first_regex
+#' @importFrom stringi stri_replace_first_regex
+#' @importFrom stringi stri_replace_all_regex
+#' @importFrom stringi stri_split_regex
 #' @importFrom utils object.size str tail
 #' @importFrom stats predict
+#' @importFrom stats median
+#' @importFrom utils head
+#' @importFrom graphics barplot
+#' @importFrom graphics grid
+#' @importFrom graphics par
+#' @importFrom graphics title
 #' 
 #' @import methods
 #' @useDynLib xgboost

@@ -33,10 +33,18 @@ include $(XGB_PLUGINS)
 
 # use customized config file
 ifndef CC
-export CC  = $(if $(shell which gcc-5),gcc-5,gcc)
+export CC  = $(if $(shell which gcc-6),gcc-6,gcc)
 endif
 ifndef CXX
-export CXX = $(if $(shell which g++-5),g++-5,g++)
+export CXX = $(if $(shell which g++-6),g++-6,g++)
+endif
+
+# on Mac OS X, force brew gcc-6, since the Xcode c++ fails anyway
+# it is useful for pip install compiling-on-the-fly
+OS := $(shell uname)
+ifeq ($(OS), Darwin)
+export CC = $(if $(shell which gcc-6),gcc-6,clang)
+export CXX = $(if $(shell which g++-6),g++-6,clang++)
 endif
 
 export LDFLAGS= -pthread -lm $(ADD_LDFLAGS) $(DMLC_LDFLAGS) $(PLUGIN_LDFLAGS)
@@ -96,16 +104,16 @@ CLI_OBJ = build/cli_main.o
 build/%.o: src/%.cc
 	@mkdir -p $(@D)
 	$(CXX) $(CFLAGS) -MM -MT build/$*.o $< >build/$*.d
-	$(CXX) -c $(CFLAGS) -c $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
 
 build_plugin/%.o: plugin/%.cc
 	@mkdir -p $(@D)
 	$(CXX) $(CFLAGS) -MM -MT build_plugin/$*.o $< >build_plugin/$*.d
-	$(CXX) -c $(CFLAGS) -c $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
 
 # The should be equivalent to $(ALL_OBJ)  except for build/cli_main.o
 amalgamation/xgboost-all0.o: amalgamation/xgboost-all0.cc
-	$(CXX) -c $(CFLAGS) -c $< -o $@
+	$(CXX) -c $(CFLAGS) $< -o $@
 
 # Equivalent to lib/libxgboost_all.so
 lib/libxgboost_all.so: $(AMALGA_OBJ) $(LIB_DEP)
@@ -140,8 +148,8 @@ clean:
 	$(RM) -rf build build_plugin lib bin *~ */*~ */*/*~ */*/*/*~ */*.o */*/*.o */*/*/*.o xgboost
 
 clean_all: clean
-	cd $(DMLC_CORE); $(MAKE) clean; cd $(ROODIR)
-	cd $(RABIT); $(MAKE) clean; cd $(ROODIR)
+	cd $(DMLC_CORE); $(MAKE) clean; cd $(ROOTDIR)
+	cd $(RABIT); $(MAKE) clean; cd $(ROOTDIR)
 
 doxygen:
 	doxygen doc/Doxyfile
@@ -150,6 +158,18 @@ doxygen:
 pypack: ${XGBOOST_DYLIB}
 	cp ${XGBOOST_DYLIB} python-package/xgboost
 	cd python-package; tar cf xgboost.tar xgboost; cd ..
+
+# create pip installation pack for PyPI
+pippack:
+	$(MAKE) clean_all
+	rm -rf xgboost-python
+	cp -r python-package xgboost-python
+	cp -r Makefile xgboost-python/xgboost/
+	cp -r make xgboost-python/xgboost/
+	cp -r src xgboost-python/xgboost/
+	cp -r include xgboost-python/xgboost/
+	cp -r dmlc-core xgboost-python/xgboost/
+	cp -r rabit xgboost-python/xgboost/
 
 # Script to make a clean installable R package.
 Rpack:

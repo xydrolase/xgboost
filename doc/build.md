@@ -28,6 +28,7 @@ even better to send pull request if you can fix the problem.
   - [Building on Ubuntu/Debian](#building-on-ubuntu-debian)
   - [Building on OSX](#building-on-osx)
   - [Building on Windows](#building-on-windows)
+  - [Windows Binaries](#windows-binaries)
   - [Customized Building](#customized-building)
 - [Python Package Installation](#python-package-installation)
 - [R Package Installation](#r-package-installation)
@@ -36,8 +37,8 @@ even better to send pull request if you can fix the problem.
 ## Build the Shared Library
 
 Our goal is to build the shared library:
-- On Linux/OSX the target library is ```libxgboost.so```
-- On Windows the target library is ```libxgboost.dll```
+- On Linux/OSX the target library is `libxgboost.so`
+- On Windows the target library is `libxgboost.dll`
 
 The minimal building requirement is
 
@@ -69,11 +70,25 @@ See the following paragraph for OpenMP enabled xgboost.
 
 
 Here is the complete solution to use OpenMP-enabled compilers to install XGBoost.
-Obtain gcc-5.x.x with openmp support by `brew install gcc --without-multilib`. (`brew` is the de facto standard of `apt-get` on OS X. So installing [HPC](http://hpc.sourceforge.net/) separately is not recommended, but it should work.)
+Obtain gcc-6.x.x with openmp support by `brew install gcc --without-multilib`. (`brew` is the de facto standard of `apt-get` on OS X. So installing [HPC](http://hpc.sourceforge.net/) separately is not recommended, but it should work.). Installation of `gcc` can take a while (~ 30 minutes)
+
+Now, clone the repository
 
 ```bash
 git clone --recursive https://github.com/dmlc/xgboost
-cd xgboost; cp make/config.mk ./config.mk; make -j4
+```
+
+and build using the following commands
+
+```bash
+cd ..; cp make/config.mk ./config.mk; make -j4
+```
+
+NOTE:
+If you use OSX El Capitan, brew installs gcc the latest version gcc-6. So you may need to modify Makefile#L46 and change gcc-5 to gcc-6. After that change gcc-5/g++-5 to gcc-6/g++-6 in make/config.mk then build using the following commands
+
+```bash
+cd ..; cp make/config.mk ./config.mk; make -j4
 ```
 
 ### Building on Windows
@@ -110,11 +125,14 @@ To build with Visual Studio 2013 use cmake. Make sure you have a recent version 
 mkdir build
 cd build
 cmake .. -G"Visual Studio 12 2013 Win64"
-``` 
+```
 
 This specifies an out of source build using the MSVC 12 64 bit generator. Open the .sln file in the build directory and build with Visual Studio. To use the Python module you can copy libxgboost.dll into python-package\xgboost.
 
 Other versions of Visual Studio may work but are untested.
+
+### Windows Binaries
+Unofficial windows binaries and instructions on how to use them are hosted on [Guido Tapia's blog](http://www.picnet.com.au/blogs/guido/post/2016/09/22/xgboost-windows-x64-binaries-for-download/)
 
 ### Customized Building
 

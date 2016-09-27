@@ -27,7 +27,7 @@ xgb.DMatrix <- function(data, info = list(), missing = NA, ...) {
                     PACKAGE = "xgboost")
     cnames <- colnames(data)
   } else if (class(data) == "dgCMatrix") {
-    handle <- .Call("XGDMatrixCreateFromCSC_R", data@p, data@i, data@x,
+    handle <- .Call("XGDMatrixCreateFromCSC_R", data@p, data@i, data@x, nrow(data),
                     PACKAGE = "xgboost")
     cnames <- colnames(data)
   } else {
@@ -54,7 +54,7 @@ xgb.DMatrix <- function(data, info = list(), missing = NA, ...) {
 # internal helper method
 xgb.get.DMatrix <- function(data, label = NULL, missing = NA, weight = NULL) {
   inClass <- class(data)
-  if (inClass == "dgCMatrix" || inClass == "matrix") {
+  if ("dgCMatrix" %in% inClass || "matrix" %in% inClass ) {
     if (is.null(label)) {
       stop("xgboost: need label when data is a matrix")
     }
